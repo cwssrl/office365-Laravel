@@ -64,7 +64,7 @@ class Office365
 
         // return $user->getBody();
 
-        return $this->client->me();
+        return $this->client->me()->get();
     }
 
     // public function getEmails($user_access_token, $limit = 10)
