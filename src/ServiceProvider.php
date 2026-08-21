@@ -15,6 +15,8 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
+        $source = realpath(__DIR__ . '/../config/office365.php');
+        $this->publishes([$source => config_path('office365.php')]);
         $this->app->bind(Office365::class, function (Container $app) {
             return new Office365($app);
         });
@@ -28,7 +30,6 @@ class ServiceProvider extends BaseServiceProvider
     public function register()
     {
         $source = realpath(__DIR__ . '/../config/office365.php');
-        $this->publishes([$source => config_path('office365.php')]);
         $this->mergeConfigFrom($source, 'office365');
     }
 }
