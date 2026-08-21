@@ -23,7 +23,8 @@ class Office365
             'authCode',
             config('office365.redirect_url'),
         );
-        $this->client = new GraphServiceClient($tokenRequestContext);
+        $scopes = explode(' ', config('office365.scopes'));
+        $this->client = new GraphServiceClient($tokenRequestContext, $scopes);
 
         // $this->client = new GenericProvider([
         //     'clientId'                => $config->get('Office365.appId'),
