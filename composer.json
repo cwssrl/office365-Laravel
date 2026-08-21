@@ -1,24 +1,40 @@
 {
-  "name": "moathdev/office365-laravel",
+  "name": "cwssrl/office365-laravel",
   "description": "A Office365 package for Laravel 5.2 or higher",
   "type": "package",
   "license": "MIT",
   "authors": [
     {
-      "name": "moathdev",
-      "email": "moath@moath.co"
+      "name": "CWS Srl",
+      "email": "info@cws.it"
     }
   ],
   "minimum-stability": "stable",
   "require": {
     "php": ">=5.6.0",
-    "illuminate/support": "~5.1",
-    "league/oauth2-client": "2.3.*",
-    "microsoft/microsoft-graph": "1.0.*"
+    "laravel/framework": ">=5",
+    "league/oauth2-client": "2.9.*",
+    "microsoft/microsoft-graph": "3.5.*"
   },
   "autoload": {
     "psr-4": {
-      "Moathdev\\Office365\\": "src/"
+      "Cwssrl\\Office365\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Cwssrl\\Office365\\ServiceProvider"
+      ],
+      "aliases": {
+        "Office365": "Cwssrl\\Office365\\Facade\\Office365"
+      }
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true,
+      "tbachert/spi": true
     }
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Moathdev\Office365\Facade;
+namespace Cwssrl\Office365\Facade;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -13,6 +13,6 @@ class Office365 extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return \Moathdev\Office365\Office365::class;
+        return \Cwssrl\Office365\Office365::class;
     }
 }

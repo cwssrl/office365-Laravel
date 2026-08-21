@@ -1,6 +1,6 @@
 <?php
 
-namespace Moathdev\Office365\Exceptions;
+namespace Cwssrl\Office365\Exceptions;
 
 use Exception;
 

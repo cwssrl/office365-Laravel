@@ -1,6 +1,6 @@
 <?php
 
-namespace Moathdev\Office365;
+namespace Cwssrl\Office365;
 
 
 use Illuminate\Contracts\Container\Container;
@@ -27,8 +27,8 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $source = realpath(__DIR__ . '/../config/Office365.php');
-        $this->publishes([$source => config_path('Office365.php')]);
-        $this->mergeConfigFrom($source, 'Office365');
+        $source = realpath(__DIR__ . '/../config/office365.php');
+        $this->publishes([$source => config_path('office365.php')]);
+        $this->mergeConfigFrom($source, 'office365');
     }
 }

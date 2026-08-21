@@ -5,22 +5,22 @@ A Office365 package for Laravel 5.2 or higher
 ## Installation
 
 ````
-composer require moathdev/office365-laravel
+composer require cwssrl/office365-laravel
 ````
 After install this package you have to set the service provider on your config/app.php file
 
 ````
-Moathdev\Office365\ServiceProvider::class,
+Cwssrl\Office365\ServiceProvider::class,
 ````
 
 To use the facade add this to the facades in app/config/app.php
 ````
-'Office365' => Moathdev\Office365\Facade\Office365::class,
+'Office365' => Cwssrl\Office365\Facade\Office365::class,
 ````
 Then you just need to publish files ! Copy and paste it
 
 ````
-php artisan vendor:publish --provider="Moathdev\Office365\ServiceProvider"
+php artisan vendor:publish --provider="Cwssrl\Office365\ServiceProvider"
 ````
 
 
@@ -42,7 +42,7 @@ OFFICE365_SCOPES='openid profile offline_access User.Read Mail.Read'
 
 namespace App\Http\Controllers;
 
-use Moathdev\Office365\Facade\Office365;
+use Cwssrl\Office365\Facade\Office365;
 
 class AuthController extends Controller
 {
