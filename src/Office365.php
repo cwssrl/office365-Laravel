@@ -2,95 +2,91 @@
 
 namespace Cwssrl\Office365;
 
-use Illuminate\Contracts\Container\Container;
+use Cwssrl\Office365\Auth\StaticAccessTokenProvider;
+use League\OAuth2\Client\Provider\GenericProvider;
 use Microsoft\Graph\Generated\Users\Item\MailFolders\Item\Messages\MessagesRequestBuilderGetRequestConfiguration;
 use Microsoft\Graph\GraphServiceClient;
-use Microsoft\Kiota\Authentication\Oauth\AuthorizationCodeContext;
+use Microsoft\Kiota\Abstractions\Authentication\BaseBearerTokenAuthenticationProvider;
+use Microsoft\Kiota\Abstractions\Serialization\Parsable;
+use Microsoft\Kiota\Serialization\Json\JsonSerializationWriter;
 
 class Office365
 {
-    /** @var GraphServiceClient */
+    /** @var GenericProvider */
     private $client;
 
-    // private $graph;
-
-    public function __construct(Container $app)
+    public function __construct()
     {
-        $tokenRequestContext = new AuthorizationCodeContext(
-            config('office365.tenantId'),
-            config('office365.appId'),
-            config('office365.secret'),
-            'authCode',
-            config('office365.redirect_url'),
-        );
-        $scopes = explode(' ', config('office365.scopes'));
-        $this->client = new GraphServiceClient($tokenRequestContext, $scopes);
-
-        // $this->client = new GenericProvider([
-        //     'clientId'                => $config->get('Office365.appId'),
-        //     'clientSecret'            => $config->get('Office365.secret'),
-        //     'redirectUri'             => $config->get('Office365.redirect_url'),
-        //     'urlAuthorize'            => $config->get('Office365.authority') . $config->get('Office365.authority_endpoint'),
-        //     'urlAccessToken'          => $config->get('Office365.authority') . $config->get('Office365.authority_token'),
-        //     'urlResourceOwnerDetails' => '',
-        //     'scopes'                  => $config->get('Office365.scopes'),
-        // ]);
+        $this->client = new GenericProvider([
+            'clientId'                => config('office365.appId'),
+            'clientSecret'            => config('office365.secret'),
+            'redirectUri'             => config('office365.redirect_url'),
+            'urlAuthorize'            => config('office365.authority') . config('office365.authority_endpoint'),
+            'urlAccessToken'          => config('office365.authority') . config('office365.authority_token'),
+            'urlResourceOwnerDetails' => 'https://graph.microsoft.com/v1.0/me',
+            'scopes'                  => config('office365.scopes'),
+        ]);
     }
 
     public function login()
     {
-        // return $this->client->getAuthorizationUrl();
+        return $this->client->getAuthorizationUrl();
     }
 
-    // public function getAccessToken($code)
-    // {
-    //     $accessToken = $this->client->getAccessToken('authorization_code', [
-    //         'code' => $code,
-    //     ]);
-
-    //     return [
-    //         'token'        => $accessToken->getToken(),
-    //         'RefreshToken' => $accessToken->getRefreshToken(),
-    //         'expires'      => $accessToken->getExpires(),
-    //     ];
-    // }
-
-    // public function getUserInfo($user_access_token)
-    public function getUserInfo()
+    public function getAccessToken(string $code)
     {
-        // $this->graph->setAccessToken($user_access_token);
+        $accessToken = $this->client->getAccessToken('authorization_code', [
+            'code' => $code,
+        ]);
 
-        // $user = $this->graph->createRequest('GET', '/me')
-        //     ->execute();
-
-        // return $user->getBody();
-
-        return $this->client->me()->get();
+        return [
+            'token'        => $accessToken->getToken(),
+            'RefreshToken' => $accessToken->getRefreshToken(),
+            'expires'      => $accessToken->getExpires(),
+        ];
     }
 
-    // public function getEmails($user_access_token, $limit = 10)
-    public function getEmails($limit = 10)
+    public function getUserInfo(string $accessToken)
     {
+        $user = $this->graphClient($accessToken)->users()->byUserId('me')->get()->wait();
 
-        // $this->graph->setAccessToken($user_access_token);
+        return $this->toArray($user);
+    }
 
-        // $messageQueryParams = [
-        //     "\$orderby" => "receivedDateTime DESC",
-        //     "\$top"     => $limit,
-        // ];
-
-        // return $this->graph->createRequest('GET', '/me/mailfolders/inbox/messages?' . http_build_query($messageQueryParams))
-        //     ->setReturnType(Model\Message::class)
-        //     ->execute();
-
+    public function getEmails(string $accessToken, int $limit = 10)
+    {
         $configuration = new MessagesRequestBuilderGetRequestConfiguration();
         $configuration->queryParameters->orderby = ['receivedDateTime DESC'];
         $configuration->queryParameters->top = $limit;
 
-        return $this->client->me()
+        $messages = $this->graphClient($accessToken)->users()->byUserId('me')
             ->mailFolders()
             ->byMailFolderId('inbox')
             ->messages()
-            ->get($configuration);
+            ->get($configuration)
+            ->wait();
+
+        return $this->toArray($messages);
+    }
+
+    private function graphClient(string $accessToken): GraphServiceClient
+    {
+        $tokenProvider = new BaseBearerTokenAuthenticationProvider(
+            new StaticAccessTokenProvider($accessToken)
+        );
+
+        return GraphServiceClient::createWithAuthenticationProvider($tokenProvider);
+    }
+
+    private function toArray(?Parsable $model): ?array
+    {
+        if ($model === null) {
+            return null;
+        }
+
+        $writer = new JsonSerializationWriter();
+        $writer->writeObjectValue(null, $model);
+
+        return json_decode((string) $writer->getSerializedContent(), true);
     }
 }

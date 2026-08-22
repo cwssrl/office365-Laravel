@@ -6,4 +6,7 @@ return [
     'secret'             => env('OFFICE365_SECRET_APP_KEY'),
     'redirect_url'       => env('OFFICE365_REDIRECT_URI'),
     'scopes'             => env('OFFICE365_SCOPES'),
+    'authority'          => env('OFFICE365_AUTHORITY','https://login.microsoftonline.com/common'),
+    'authority_endpoint' => env('OFFICE365_AUTHORITY_ENDPOINT','/oauth2/v2.0/authorize'),
+    'authority_token'    => env('OFFICE365_AUTHORITY_TOKEN','/oauth2/v2.0/token'),
 ];
