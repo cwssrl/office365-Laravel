@@ -48,7 +48,7 @@ class Office365
 
     public function getUserInfo(string $accessToken)
     {
-        $user = $this->graphClient($accessToken)->users()->byUserId('me')->get()->wait();
+        $user = $this->graphClient($accessToken)->me()->get()->wait();
 
         return $this->toArray($user);
     }
@@ -59,7 +59,7 @@ class Office365
         $configuration->queryParameters->orderby = ['receivedDateTime DESC'];
         $configuration->queryParameters->top = $limit;
 
-        $messages = $this->graphClient($accessToken)->users()->byUserId('me')
+        $messages = $this->graphClient($accessToken)->me()
             ->mailFolders()
             ->byMailFolderId('inbox')
             ->messages()
